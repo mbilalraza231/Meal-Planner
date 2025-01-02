@@ -61,7 +61,7 @@ export default function RecipeDetails() {
 
           <div className="flex items-center gap-4 mb-6">
             <span className="text-gray-600 dark:text-gray-300">
-              ⏱️ {recipe.CookingTime}
+              ⏱️ {recipe.cookingTime}
             </span>
             <span className="text-gray-600 dark:text-gray-300">
               👥 Serves {recipe.servings}

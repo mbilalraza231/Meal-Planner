@@ -1,9 +1,9 @@
 // app/api/meal-plans/route.js
 
 import { NextResponse } from "next/server";
-import connectDB from '../../../db/db.js'; 
+import { dbConnect } from '@/db/connectDb';
+import MealPlan from '@/db/models/MealPlan';
 
-import MealPlan from '../../../models/MealPlan.js'; 
 export async function GET(request) {
   try {
     await dbConnect();
@@ -18,8 +18,8 @@ export async function GET(request) {
     }
 
     const userMealPlans = await MealPlan.find({ userId })
-      .sort({ weekStart: -1 }) // Sort by week start date, newest first
-      .populate('meals'); // If you have meal references in your schema
+      .sort({ weekStart: -1 })
+      .populate('meals.recipes');
 
     return NextResponse.json({ mealPlans: userMealPlans });
   } catch (error) {
