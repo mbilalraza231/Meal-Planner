@@ -1,5 +1,5 @@
-
 import mongoose from 'mongoose';
+
 const MealSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -27,5 +27,11 @@ const MealSchema = new mongoose.Schema({
     enum: ['breakfast', 'lunch', 'dinner', 'snack'],
     required: true
   },
-  notes: String
+  notes: String,
+  date: {
+    type: Date,
+    required: true
+  }
 }, { timestamps: true });
+
+export default mongoose.models.Meal || mongoose.model('Meal', MealSchema);
