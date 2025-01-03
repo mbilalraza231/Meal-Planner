@@ -2,7 +2,7 @@
   {
     "title": "Chicken Karahi",
     "description": "A traditional Pakistani chicken curry cooked in a wok.",
-    "image": "/R.jpeg",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
     "category": "Pakistani",
     "ingredients": [
       "500g chicken",
@@ -27,7 +27,7 @@
   {
     "title": "Penne Arrabbiata",
     "description": "A spicy Italian pasta dish with tomato sauce.",
-    "image": "/R.jpeg",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
     "category": "Italian",
     "ingredients": [
       "200g penne pasta",
@@ -51,7 +51,7 @@
   {
     "title": "Beef Kebab Skewers",
     "description": "Grilled Turkish-style beef kebabs with spices.",
-    "image": "/R.jpeg",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
     "category": "Turkish",
     "ingredients": [
       "300g ground beef",
@@ -75,7 +75,7 @@
   {
     "title": "Shrimp Scampi",
     "description": "A garlic butter seafood pasta dish.",
-    "image": "/R.jpeg",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
     "category": "Seafood",
     "ingredients": [
       "200g shrimp",
@@ -98,7 +98,7 @@
   {
     "title": "Chocolate Lava Cake",
     "description": "A rich and gooey chocolate dessert.",
-    "image": "/R.jpeg",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
     "category": "Dessert",
     "ingredients": [
       "100g dark chocolate",
@@ -120,7 +120,7 @@
   {
     "title": "Lassi",
     "description": "A refreshing Pakistani yogurt-based drink.",
-    "image": "/R.jpeg",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
     "category": "Drinks",
     "ingredients": [
       "1 cup yogurt",
@@ -142,7 +142,7 @@
   {
     "title": "Egg Fried Rice",
     "description": "Quick Chinese-style fried rice with eggs and vegetables.",
-    "image": "/R.jpeg",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
     "category": "Asian",
     "ingredients": [
       "2 cups cooked rice",
@@ -165,7 +165,7 @@
   {
     "title": "Shepherd’s Pie",
     "description": "A comforting Western dish with minced meat and mashed potatoes.",
-    "image": "/R.jpeg",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
     "category": "Western",
     "ingredients": [
       "300g ground lamb",
@@ -188,7 +188,7 @@
   {
     "title": "Grilled Salmon",
     "description": "Healthy and tasty grilled salmon with lemon butter.",
-    "image": "/R.jpeg",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
     "category": "Seafood",
     "ingredients": [
       "2 salmon fillets",
@@ -210,7 +210,7 @@
   {
     "title": "Mango Smoothie",
     "description": "A tropical mango smoothie perfect for summer.",
-    "image": "/R.jpeg",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
     "category": "Drinks",
     "ingredients": [
       "1 ripe mango",
