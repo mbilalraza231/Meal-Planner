@@ -227,5 +227,236 @@
     "servings": 2,
     "rating": 4.8,
     "reviews": 20
+  },
+  {
+    "title": "Chicken Karahi",
+    "description": "A traditional Pakistani chicken curry cooked in a wok.",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
+    "category": "Pakistani",
+    "ingredients": [
+      "500g chicken",
+      "2 tomatoes",
+      "2 onions",
+      "3 cloves garlic",
+      "1-inch ginger",
+      "Green chilies",
+      "Spices"
+    ],
+    "instructions": [
+      "Fry onions and garlic until golden.",
+      "Add chicken and cook until brown.",
+      "Add tomatoes and spices, then simmer.",
+      "Garnish with ginger and green chilies."
+    ],
+    "cookingTime": "40 minutes",
+    "servings": 3,
+    "rating": 4.9,
+    "reviews": 40
+  },
+  {
+    "title": "Penne Arrabbiata",
+    "description": "A spicy Italian pasta dish with tomato sauce.",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
+    "category": "Italian",
+    "ingredients": [
+      "200g penne pasta",
+      "2 cloves garlic",
+      "Chili flakes",
+      "Olive oil",
+      "1 can tomato sauce",
+      "Parmesan cheese"
+    ],
+    "instructions": [
+      "Cook pasta in salted water.",
+      "Saute garlic and chili flakes in olive oil.",
+      "Add tomato sauce and simmer.",
+      "Mix pasta with sauce and top with cheese."
+    ],
+    "cookingTime": "25 minutes",
+    "servings": 2,
+    "rating": 4.6,
+    "reviews": 22
+  },
+  {
+    "title": "Beef Kebab Skewers",
+    "description": "Grilled Turkish-style beef kebabs with spices.",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
+    "category": "Turkish",
+    "ingredients": [
+      "300g ground beef",
+      "1 onion",
+      "1 tsp paprika",
+      "1 tsp cumin",
+      "Salt and pepper",
+      "Skewers"
+    ],
+    "instructions": [
+      "Mix beef with spices and grated onion.",
+      "Shape into long kebabs.",
+      "Grill on skewers until cooked through.",
+      "Serve with pita bread and salad."
+    ],
+    "cookingTime": "30 minutes",
+    "servings": 3,
+    "rating": 4.8,
+    "reviews": 30
+  },
+  {
+    "title": "Shrimp Scampi",
+    "description": "A garlic butter seafood pasta dish.",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
+    "category": "Seafood",
+    "ingredients": [
+      "200g shrimp",
+      "200g linguine pasta",
+      "4 cloves garlic",
+      "Butter",
+      "Lemon juice",
+      "Parsley"
+    ],
+    "instructions": [
+      "Cook pasta until al dente.",
+      "Saute garlic in butter, then add shrimp.",
+      "Toss pasta in the sauce and garnish with parsley."
+    ],
+    "cookingTime": "20 minutes",
+    "servings": 2,
+    "rating": 4.7,
+    "reviews": 18
+  },
+  {
+    "title": "Chocolate Lava Cake",
+    "description": "A rich and gooey chocolate dessert.",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
+    "category": "Dessert",
+    "ingredients": [
+      "100g dark chocolate",
+      "50g butter",
+      "2 eggs",
+      "50g sugar",
+      "30g flour"
+    ],
+    "instructions": [
+      "Melt chocolate and butter.",
+      "Whisk eggs and sugar, then mix in flour.",
+      "Combine with chocolate and bake for 10 minutes."
+    ],
+    "cookingTime": "15 minutes",
+    "servings": 2,
+    "rating": 4.9,
+    "reviews": 40
+  },
+  {
+    "title": "Lassi",
+    "description": "A refreshing Pakistani yogurt-based drink.",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
+    "category": "Drinks",
+    "ingredients": [
+      "1 cup yogurt",
+      "1/2 cup water",
+      "2 tbsp sugar",
+      "Ice cubes",
+      "Mint leaves (optional)"
+    ],
+    "instructions": [
+      "Blend yogurt, water, and sugar until smooth.",
+      "Add ice and blend again.",
+      "Garnish with mint leaves."
+    ],
+    "cookingTime": "5 minutes",
+    "servings": 2,
+    "rating": 4.7,
+    "reviews": 15
+  },
+  {
+    "title": "Egg Fried Rice",
+    "description": "Quick Chinese-style fried rice with eggs and vegetables.",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
+    "category": "Asian",
+    "ingredients": [
+      "2 cups cooked rice",
+      "2 eggs",
+      "Carrots",
+      "Green onions",
+      "Soy sauce",
+      "Sesame oil"
+    ],
+    "instructions": [
+      "Scramble eggs and set aside.",
+      "Stir fry vegetables in sesame oil.",
+      "Add rice, eggs, and soy sauce. Mix well."
+    ],
+    "cookingTime": "15 minutes",
+    "servings": 3,
+    "rating": 4.6,
+    "reviews": 20
+  },
+  {
+    "title": "Shepherd’s Pie",
+    "description": "A comforting Western dish with minced meat and mashed potatoes.",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
+    "category": "Western",
+    "ingredients": [
+      "300g ground lamb",
+      "2 potatoes",
+      "1 onion",
+      "Carrots",
+      "Peas",
+      "Gravy"
+    ],
+    "instructions": [
+      "Cook meat and vegetables in gravy.",
+      "Boil and mash potatoes.",
+      "Layer meat and potatoes, then bake until golden."
+    ],
+    "cookingTime": "40 minutes",
+    "servings": 3,
+    "rating": 4.8,
+    "reviews": 28
+  },
+  {
+    "title": "Grilled Salmon",
+    "description": "Healthy and tasty grilled salmon with lemon butter.",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
+    "category": "Seafood",
+    "ingredients": [
+      "2 salmon fillets",
+      "Lemon",
+      "Garlic",
+      "Butter",
+      "Herbs"
+    ],
+    "instructions": [
+      "Marinate salmon in lemon and garlic.",
+      "Grill until flaky and golden.",
+      "Serve with butter sauce."
+    ],
+    "cookingTime": "20 minutes",
+    "servings": 2,
+    "rating": 4.9,
+    "reviews": 35
+  },
+  {
+    "title": "Mango Smoothie",
+    "description": "A tropical mango smoothie perfect for summer.",
+    "image": "https://i.postimg.cc/RZ82WGqP/R.jpg",
+    "category": "Drinks",
+    "ingredients": [
+      "1 ripe mango",
+      "1 cup milk",
+      "2 tbsp sugar",
+      "Ice cubes"
+    ],
+    "instructions": [
+      "Blend mango, milk, and sugar.",
+      "Add ice cubes and blend again.",
+      "Serve chilled."
+    ],
+    "cookingTime": "5 minutes",
+    "servings": 2,
+    "rating": 4.8,
+    "reviews": 20
   }
 ]
+
+
