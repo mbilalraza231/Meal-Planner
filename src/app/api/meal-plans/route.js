@@ -3,90 +3,54 @@
 import { NextResponse } from "next/server";
 import { dbConnect } from '@/db/connectDb';
 import MealPlan from '@/db/models/MealPlan';
+import Recipe from '@/db/models/Recipe';
 
-export async function GET(request) {
+export async function GET() {
+  await dbConnect();
   try {
-    await dbConnect();
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: "User ID is required" }, 
-        { status: 400 }
-      );
-    }
-
-    const userMealPlans = await MealPlan.find({ userId })
-      .sort({ weekStart: -1 })
-      .populate('meals.recipes');
-
-    return NextResponse.json({ mealPlans: userMealPlans });
+    const mealPlans = await MealPlan.find().sort({ date: 1 });
+    return NextResponse.json(mealPlans);
   } catch (error) {
-    console.error("Error fetching meal plans:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch meal plans" },
-      { status: 500 }
-    );
+    console.error('Error fetching meal plans:', error);
+    return NextResponse.json({ error: 'Failed to fetch meal plans' }, { status: 500 });
   }
 }
 
 export async function POST(request) {
+  await dbConnect();
   try {
-    await dbConnect();
-    const mealPlan = await request.json();
+    const mealData = await request.json();
+    console.log('API received data:', mealData);
 
-    // Validate required fields
-    if (!mealPlan.userId || !mealPlan.weekStart || !mealPlan.meals) {
-      return NextResponse.json(
-        { 
-          error: "Missing required fields",
-          details: "userId, weekStart, and meals are required"
-        },
-        { status: 400 }
-      );
-    }
-
-    // Validate meals array structure
-    if (!Array.isArray(mealPlan.meals) || mealPlan.meals.length === 0) {
-      return NextResponse.json(
-        { error: "Meals must be a non-empty array" },
-        { status: 400 }
-      );
-    }
-
-    // Create new meal plan with additional metadata
     const newMealPlan = new MealPlan({
-      ...mealPlan,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      status: 'active', // You might want to add a status field
+      userId: mealData.userId,
+      date: new Date(mealData.date),
+      mealType: mealData.mealType,
+      details: {
+        name: mealData.details.name,
+        ingredients: mealData.details.ingredients || [],
+        instructions: mealData.details.instructions || [],
+        cookingTime: mealData.details.cookingTime || "",
+        servings: mealData.details.servings || 1
+      },
+      notes: mealData.notes || "",
+      recipeId: mealData.recipeId,
+      mealId: mealData.mealId
     });
 
-    // Save to database
-    await newMealPlan.save();
-
-    // Return the saved meal plan with populated meals if needed
-    const savedMealPlan = await MealPlan.findById(newMealPlan._id)
-      .populate('meals'); // If you have meal references
+    console.log('Attempting to save meal plan:', JSON.stringify(newMealPlan, null, 2));
+    const savedMealPlan = await newMealPlan.save();
+    console.log('Meal plan saved successfully:', savedMealPlan._id);
 
     return NextResponse.json(savedMealPlan, { status: 201 });
   } catch (error) {
-    console.error("Error creating meal plan:", error);
-    
-    // Handle different types of errors
-    if (error.name === 'ValidationError') {
-      return NextResponse.json(
-        { 
-          error: "Validation error",
-          details: error.message 
-        },
-        { status: 400 }
-      );
-    }
-
+    console.error('Detailed error:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack
+    });
     return NextResponse.json(
-      { error: "Failed to create meal plan" },
+      { error: error.message || 'Failed to create meal plan' },
       { status: 500 }
     );
   }

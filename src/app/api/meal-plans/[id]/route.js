@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbConnect } from '@/db/connectDb';
 import MealPlan from '@/db/models/MealPlan';
+import mongoose from 'mongoose';
 
 export async function GET(request, { params }) {
   await dbConnect();
@@ -47,6 +48,11 @@ export async function DELETE(request, { params }) {
   await dbConnect();
   const id = params.id;
 
+  // Validate the ID format
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
+  }
+
   try {
     const mealPlan = await MealPlan.findByIdAndDelete(id);
     if (!mealPlan) {
@@ -54,7 +60,7 @@ export async function DELETE(request, { params }) {
     }
     return NextResponse.json({ message: "Meal plan deleted successfully" });
   } catch (error) {
-    console.error("Error deleting meal plan:", error);
+    console.error("Error deleting meal plan:", error.message);
     return NextResponse.json({ error: "Failed to delete meal plan" }, { status: 500 });
   }
 } 

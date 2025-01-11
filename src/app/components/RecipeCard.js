@@ -3,8 +3,17 @@
 import { useRouter } from "next/navigation";
 import { FaClock, FaUtensils, FaStar, FaRegBookmark } from "react-icons/fa";
 
-export default function RecipeCard({ recipe, onAddToMealPlan }) {
+export default function RecipeCard({ recipe }) {
   const router = useRouter();
+
+  const handleAddToMealPlan = () => {
+    try {
+      localStorage.setItem("selectedRecipeForMealPlan", JSON.stringify(recipe));
+      router.push("/meal-planner"); // Navigate to the meal planner page
+    } catch (error) {
+      console.error("Error adding to meal plan:", error);
+    }
+  };
 
   return (
     <div className="bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
@@ -64,7 +73,7 @@ export default function RecipeCard({ recipe, onAddToMealPlan }) {
             View Recipe
           </button>
           <button
-            onClick={() => onAddToMealPlan(recipe)}
+            onClick={handleAddToMealPlan} // Open the modal by navigating to meal planner
             className="flex-1 bg-indigo-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors active:scale-95 transform"
           >
             Add to Plan
