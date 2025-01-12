@@ -6,14 +6,9 @@ const MealSchema = new mongoose.Schema({
     required: true,
     default: 'temp-user-id'
   },
-  name: { 
+  mealName: { 
     type: String, 
     required: true 
-  },
-  mealType: {
-    type: String,
-    enum: ['breakfast', 'lunch', 'dinner', 'snack'],
-    required: true
   },
   // Essential meal details
   ingredients: [String],
@@ -25,6 +20,10 @@ const MealSchema = new mongoose.Schema({
 
 // Add indexes for better query performance
 MealSchema.index({ userId: 1 });
-MealSchema.index({ mealType: 1 });
 
-export default mongoose.models.Meal || mongoose.model('Meal', MealSchema);
+// Delete the model if it exists to force recompilation
+if (mongoose.models.Meal) {
+  delete mongoose.models.Meal;
+}
+
+export default mongoose.model('Meal', MealSchema);

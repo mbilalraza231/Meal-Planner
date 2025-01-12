@@ -28,7 +28,7 @@ const mealPlanSchema = new mongoose.Schema({
     default: 'dinner'
   },
   details: {
-    name: { type: String, required: true },
+    mealName: { type: String, required: true },
     ingredients: { type: [String], default: [] },
     instructions: { type: [String], default: [] },
     cookingTime: { type: String, default: "" },

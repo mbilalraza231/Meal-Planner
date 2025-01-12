@@ -7,26 +7,35 @@ export default function AddMealModal({ show, onClose, onSubmit, onSuccess = () =
   
   const [mealPlan, setMealPlan] = useState(recipe ? {
     recipeId: recipe._id,
-    name: recipe.title,
     mealType: "dinner",
-    ingredients: recipe.ingredients,
-    instructions: recipe.instructions,
-    cookingTime: recipe.cookingTime,
-    servings: recipe.servings,
-    notes: "",
     date: new Date().toISOString().split('T')[0],
-    isCustomMeal: false  // This is a recipe, not a custom meal
-  } : null);
+    notes: "",
+    details: {
+      mealName: recipe.title,
+      servings: recipe.servings,
+      cookingTime: recipe.cookingTime,
+      ingredients: recipe.ingredients,
+      instructions: recipe.instructions
+    }
+  } : {
+    mealType: "dinner",
+    date: new Date().toISOString().split('T')[0],
+    notes: "",
+    details: {
+      mealName: "",
+      servings: 1,
+      cookingTime: "",
+      ingredients: [],
+      instructions: []
+    }
+  });
 
   const [meal, setMeal] = useState({
     recipeName: "",
-    mealType: "dinner",
     servings: 1,
-    details: {
-      ingredients: [],
-      instructions: [],
-      cookingTime: "",
-    },
+    ingredients: [],
+    instructions: [],
+    cookingTime: "",
     notes: ""
   });
 
@@ -40,7 +49,8 @@ export default function AddMealModal({ show, onClose, onSubmit, onSuccess = () =
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create meal');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create meal');
       }
 
       const savedMeal = await response.json();
@@ -48,17 +58,19 @@ export default function AddMealModal({ show, onClose, onSubmit, onSuccess = () =
       // Prepare meal plan data with only mealId for custom meals
       const mealPlanData = {
         mealId: savedMeal._id,
-        name: savedMeal.name,
-        mealType: savedMeal.mealType,
-        ingredients: savedMeal.ingredients,
-        instructions: savedMeal.instructions,
-        cookingTime: savedMeal.cookingTime,
-        servings: savedMeal.servings,
-        notes: savedMeal.notes,
-        date: new Date().toISOString().split('T')[0],
-        isCustomMeal: true  // Add this flag to indicate it's a custom meal
+        mealType: mealPlan.mealType || "dinner",
+        date: mealPlan.date || new Date().toISOString().split('T')[0],
+        notes: savedMeal.notes || "",
+        details: {
+          mealName: savedMeal.mealName,
+          servings: savedMeal.servings,
+          cookingTime: savedMeal.cookingTime,
+          ingredients: savedMeal.ingredients,
+          instructions: savedMeal.instructions
+        }
       };
 
+      console.log('Setting meal plan data:', mealPlanData); // Debug log
       setMealPlan(mealPlanData);
       setStep(2);
     } catch (error) {
@@ -69,12 +81,43 @@ export default function AddMealModal({ show, onClose, onSubmit, onSuccess = () =
 
   const handleSubmit = async (mealPlanData) => {
     try {
+      console.log('Received meal plan data:', mealPlanData); // Debug log
+
+      // Create the data structure exactly as needed by the schema
+      const dataToSend = {
+        userId: 'temp-user-id',
+        mealType: mealPlanData.mealType || 'dinner',  // Ensure mealType is included
+        date: mealPlanData.date || new Date().toISOString().split('T')[0],
+        notes: mealPlanData.notes || "",
+        details: {
+          mealName: mealPlanData.details?.mealName || "",
+          servings: mealPlanData.details?.servings || 1,
+          cookingTime: mealPlanData.details?.cookingTime || "",
+          ingredients: mealPlanData.details?.ingredients || [],
+          instructions: mealPlanData.details?.instructions || []
+        }
+      };
+
+      // Add mealId or recipeId if present
+      if (mealPlanData.mealId) {
+        dataToSend.mealId = mealPlanData.mealId;
+      }
+      if (mealPlanData.recipeId) {
+        dataToSend.recipeId = mealPlanData.recipeId;
+      }
+
+      console.log('Sending meal plan data:', dataToSend); // Debug log
+
+      // Make the API request with the complete data structure
       const response = await fetch('/api/meal-plans', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(mealPlanData)
+        body: JSON.stringify({
+          ...dataToSend,
+          mealType: mealPlanData.mealType || 'dinner'  // Ensure mealType is included at the root level
+        })
       });
 
       if (!response.ok) {
@@ -112,12 +155,14 @@ export default function AddMealModal({ show, onClose, onSubmit, onSuccess = () =
             meal={meal}
             onMealChange={setMeal}
             onSubmit={handleMealSubmit}
+            buttonText="Continue to Meal Plan"
           />
         ) : (
           <MealPlanForm 
             mealPlan={mealPlan}
             onMealPlanChange={setMealPlan}
             onSubmit={handleSubmit}
+            buttonText="Add to Meal Plan"
           />
         )}
       </div>

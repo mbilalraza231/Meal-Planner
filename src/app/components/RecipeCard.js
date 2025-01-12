@@ -73,7 +73,7 @@ export default function RecipeCard({ recipe, onAddToMealPlan }) {
             onClick={handleAddToMealPlan}
             className="flex-1 bg-indigo-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors active:scale-95 transform"
           >
-            Add to Meal Plan
+            Add to Plan
           </button>
         </div>
       </div>

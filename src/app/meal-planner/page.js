@@ -7,6 +7,8 @@ import MealPlannerWelcome from '../components/MealPlannerWelcome';
 import AddMealModal from '../components/modals/AddMealModal';
 import DeleteConfirmModal from '../components/modals/DeleteConfirmModal';
 import ViewDetailsModal from '../components/modals/ViewDetailsModal';
+import EditMealPlanForm from '../components/forms/EditMealPlanForm';
+import Modal from '../components/modals/Modal';
 
 const DetailsModal = ({ mealPlan, onClose }) => {
   if (!mealPlan) return null;
@@ -64,6 +66,7 @@ export default function MealPlannerPage() {
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const handleAddNew = () => {
     setShowAddModal(true);
@@ -102,9 +105,72 @@ export default function MealPlannerPage() {
     setShowDetailsModal(true);
   };
 
-  const closeDetailsModal = () => {
-    setShowDetailsModal(false);
+  const handleEdit = (plan) => {
+    setSelectedPlan({
+      ...plan,
+      details: plan.details || {
+        mealName: '',
+        ingredients: [],
+        instructions: [],
+        cookingTime: '',
+        servings: 1
+      }
+    });
+    setShowEditModal(true);
+  };
+
+  const closeEditModal = () => {
+    setShowEditModal(false);
     setSelectedPlan(null);
+  };
+
+  const handleEditSubmit = async (updatedMealPlan) => {
+    try {
+      const restructuredData = {
+        userId: 'temp-user-id',
+        mealType: updatedMealPlan.mealType || 'dinner',
+        date: updatedMealPlan.date,
+        notes: updatedMealPlan.notes || "",
+        details: {
+          mealName: updatedMealPlan.details.mealName,
+          servings: parseInt(updatedMealPlan.details.servings) || 1,
+          cookingTime: updatedMealPlan.details.cookingTime || "",
+          ingredients: updatedMealPlan.details.ingredients || [],
+          instructions: updatedMealPlan.details.instructions || []
+        }
+      };
+
+      console.log('Sending update with data:', restructuredData); // Debug log
+
+      const response = await fetch(`/api/meal-plans/${selectedPlan._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(restructuredData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update meal plan');
+      }
+
+      const updatedPlan = await response.json();
+      console.log('Successfully updated plan:', updatedPlan); // Debug log
+
+      // Only update UI after successful API response
+      setMealPlans((prevPlans) => 
+        prevPlans.map((plan) => 
+          plan._id === updatedPlan._id ? updatedPlan : plan
+        )
+      );
+      
+      closeEditModal();
+    } catch (error) {
+      console.error('Error updating meal plan:', error);
+      alert(error.message || 'Failed to update meal plan');
+      // Don't close modal on error so user can try again
+    }
   };
 
   return (
@@ -140,7 +206,7 @@ export default function MealPlannerPage() {
                 {mealPlans.map((plan) => (
                   <tr key={plan._id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <td className="px-6 py-4 text-gray-900 dark:text-white">
-                      {plan.details.name} 
+                      {plan.details.mealName} 
                     </td>
                     <td className="px-6 py-4 text-gray-900 dark:text-white">
                       {format(new Date(plan.date), "MMM dd, yyyy")}
@@ -148,15 +214,14 @@ export default function MealPlannerPage() {
                     <td className="px-6 py-4">
                       <span
                         className={`px-3 py-1 rounded-full text-sm ${
-                          plan.mealType === "breakfast"
+                          plan?.mealType === "breakfast"
                             ? "bg-yellow-100 text-yellow-800"
-                            : plan.mealType === "lunch"
+                            : plan?.mealType === "lunch"
                             ? "bg-green-100 text-green-800"
                             : "bg-blue-100 text-blue-800"
                         }`}
                       >
-                        {plan.mealType.charAt(0).toUpperCase() +
-                          plan.mealType.slice(1)}
+                        {(plan?.mealType || "dinner").charAt(0).toUpperCase() + (plan?.mealType || "dinner").slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -197,12 +262,37 @@ export default function MealPlannerPage() {
           onClose={() => setShowAddModal(false)}
           onSubmit={async (mealPlanData) => {
             try {
+              // Ensure mealType is included in the request
+              const dataToSubmit = {
+                userId: 'temp-user-id',
+                mealType: mealPlanData.mealType || 'dinner',
+                date: mealPlanData.date,
+                notes: mealPlanData.notes || "",
+                details: {
+                  mealName: mealPlanData.details.mealName,
+                  servings: mealPlanData.details.servings,
+                  cookingTime: mealPlanData.details.cookingTime,
+                  ingredients: mealPlanData.details.ingredients || [],
+                  instructions: mealPlanData.details.instructions || []
+                }
+              };
+
+              // Add mealId or recipeId if present
+              if (mealPlanData.mealId) {
+                dataToSubmit.mealId = mealPlanData.mealId;
+              }
+              if (mealPlanData.recipeId) {
+                dataToSubmit.recipeId = mealPlanData.recipeId;
+              }
+
+              console.log('Submitting meal plan data:', dataToSubmit);
+
               const response = await fetch('/api/meal-plans', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(mealPlanData)
+                body: JSON.stringify(dataToSubmit)
               });
 
               if (!response.ok) {
@@ -227,7 +317,15 @@ export default function MealPlannerPage() {
         onConfirm={handleConfirmDelete}
       />
 
-      <ViewDetailsModal show={showDetailsModal} onClose={closeDetailsModal} mealPlan={selectedPlan} />
+      <ViewDetailsModal show={showDetailsModal} onClose={() => setShowDetailsModal(false)} mealPlan={selectedPlan} />
+
+      <Modal show={showEditModal} onClose={closeEditModal}>
+        <EditMealPlanForm 
+          mealPlan={selectedPlan}
+          onMealPlanChange={setSelectedPlan} 
+          onSubmit={handleEditSubmit} 
+        />
+      </Modal>
     </div>
   );
 }
