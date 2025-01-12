@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit }) {
   const handleChange = (field, value) => {
-    if (field === 'name' || field === 'servings' || field === 'cookingTime' || field === 'ingredients' || field === 'instructions') {
+    if (field === 'mealName' || field === 'servings' || field === 'cookingTime' || field === 'ingredients' || field === 'instructions') {
       // These fields should be in the details object
       onMealPlanChange({
         ...mealPlan,
@@ -11,8 +11,12 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
           [field]: value
         }
       });
+    } else if (field === 'date') {
+      // Ensure date is properly formatted
+      const formattedDate = new Date(value).toISOString().split('T')[0];
+      onMealPlanChange({ ...mealPlan, date: formattedDate });
     } else {
-      // Other fields like date, mealType, and notes are at the root level
+      // Other fields like mealType and notes are at the root level
       onMealPlanChange({ ...mealPlan, [field]: value });
     }
   };
@@ -21,6 +25,11 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
     e.preventDefault();
     onSubmit(mealPlan);
   };
+
+  // Format the initial date if it exists, otherwise use today's date
+  const formattedDate = mealPlan?.date 
+    ? new Date(mealPlan.date).toISOString().split('T')[0]
+    : new Date().toISOString().split('T')[0];
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col h-[500px]">
@@ -33,7 +42,7 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
             </label>
             <input
               type="date"
-              value={mealPlan.date || new Date().toISOString().split('T')[0]}
+              value={formattedDate}
               onChange={(e) => handleChange('date', e.target.value)}
               className="w-full px-3 py-2 text-md border rounded-md dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500"
               required
@@ -58,34 +67,31 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
           </div>
         </div>
 
-        <div className="mb-2">
+        <div>
           <label className="block text-md font-medium text-gray-700 dark:text-gray-200 mb-1">
-            Notes (Optional)
+            Notes
           </label>
           <textarea
             value={mealPlan.notes || ""}
             onChange={(e) => handleChange('notes', e.target.value)}
-            className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 text-md border rounded-md dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500"
             rows="2"
-            placeholder="Add any notes about this meal..."
           />
         </div>
       </div>
 
-      {/* Scrollable Middle Section for Recipe Details */}
-      <div className="flex-1 overflow-y-auto pr-3 custom-scrollbar">
-        <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg opacity-85 mb-4">
-          <h3 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-3">Recipe Details</h3>
-          
-          <div className="space-y-3">
+      {/* Scrollable Middle Section */}
+      <div className="flex-grow overflow-y-auto">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-indigo-100 dark:border-indigo-900">
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Meal Name
+                Recipe Name
               </label>
               <input
                 type="text"
-                value={mealPlan.details?.name || ""}
-                onChange={(e) => handleChange('name', e.target.value)}
+                value={mealPlan.details?.mealName || ""}
+                onChange={(e) => handleChange('mealName', e.target.value)}
                 className="w-full px-3 py-2 border rounded-md dark:bg-gray-700"
                 required
               />
