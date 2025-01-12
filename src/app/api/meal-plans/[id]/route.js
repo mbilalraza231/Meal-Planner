@@ -29,7 +29,7 @@ export async function PUT(request, { params }) {
       id,
       updateData,
       { new: true, runValidators: true }
-    ).populate('meals.recipes');
+    );
 
     if (!mealPlan) {
       return NextResponse.json({ error: "Meal plan not found" }, { status: 404 });

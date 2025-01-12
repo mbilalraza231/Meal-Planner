@@ -127,24 +127,10 @@ export default function MealPlannerPage() {
 
   const handleEditSubmit = async (updatedMealPlan) => {
     try {
-      const restructuredData = {
-        userId: 'temp-user-id',
-        mealType: updatedMealPlan.mealType || 'dinner',
-        date: new Date(updatedMealPlan.date).toISOString().split('T')[0],
-        notes: updatedMealPlan.notes || "",
-        details: {
-          mealName: updatedMealPlan.details.mealName,
-          servings: parseInt(updatedMealPlan.details.servings) || 1,
-          cookingTime: updatedMealPlan.details.cookingTime || "",
-          ingredients: updatedMealPlan.details.ingredients || [],
-          instructions: updatedMealPlan.details.instructions || []
-        }
-      };
-
-      // Update UI optimistically
+      // Optimistically update UI
       setMealPlans(prevPlans => 
         prevPlans.map(plan => 
-          plan._id === selectedPlan._id ? {...plan, ...restructuredData} : plan
+          plan._id === selectedPlan._id ? { ...plan, ...updatedMealPlan } : plan
         )
       );
 
@@ -153,36 +139,29 @@ export default function MealPlannerPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(restructuredData),
+        body: JSON.stringify(updatedMealPlan),
       });
 
-      // Only try to parse response if it's not ok
       if (!response.ok) {
-        let errorMessage = 'Failed to update meal plan';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (e) {
-          // If we can't parse the error message, use the default one
-        }
-        throw new Error(errorMessage);
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update meal plan');
       }
 
-      // Close the modal after successful update
+      // Close modal on success
       closeEditModal();
+      alert('Changes saved successfully!');
     } catch (error) {
       console.error('Error updating meal plan:', error);
-      // Revert the optimistic update on error
-      const response = await fetch(`/api/meal-plans/${selectedPlan._id}`);
-      if (response.ok) {
-        const currentData = await response.json();
-        setMealPlans(prevPlans => 
-          prevPlans.map(plan => 
-            plan._id === selectedPlan._id ? currentData : plan
-          )
-        );
-      }
       alert(error.message);
+      
+      // Revert optimistic update on error
+      const response = await fetch(`/api/meal-plans/${selectedPlan._id}`);
+      const currentPlan = await response.json();
+      setMealPlans(prevPlans => 
+        prevPlans.map(plan => 
+          plan._id === selectedPlan._id ? currentPlan : plan
+        )
+      );
     }
   };
 

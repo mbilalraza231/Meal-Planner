@@ -3,7 +3,6 @@ import React from 'react';
 export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit }) {
   const handleChange = (field, value) => {
     if (field === 'mealName' || field === 'servings' || field === 'cookingTime' || field === 'ingredients' || field === 'instructions') {
-      // These fields should be in the details object
       onMealPlanChange({
         ...mealPlan,
         details: {
@@ -12,11 +11,9 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
         }
       });
     } else if (field === 'date') {
-      // Ensure date is properly formatted
       const formattedDate = new Date(value).toISOString().split('T')[0];
       onMealPlanChange({ ...mealPlan, date: formattedDate });
     } else {
-      // Other fields like mealType and notes are at the root level
       onMealPlanChange({ ...mealPlan, [field]: value });
     }
   };
