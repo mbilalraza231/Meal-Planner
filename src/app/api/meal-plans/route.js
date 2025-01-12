@@ -3,7 +3,7 @@
 import { NextResponse } from "next/server";
 import { dbConnect } from '@/db/connectDb';
 import MealPlan from '@/db/models/MealPlan';
-import Recipe from '@/db/models/Recipe';
+import mongoose from 'mongoose';
 
 export async function GET() {
   await dbConnect();
@@ -17,41 +17,39 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  await dbConnect();
   try {
-    const mealData = await request.json();
-    console.log('API received data:', mealData);
+    await dbConnect();
+    const data = await request.json();
+    console.log('Raw API received data:', data);
 
-    const newMealPlan = new MealPlan({
-      userId: mealData.userId,
-      date: new Date(mealData.date),
-      mealType: mealData.mealType,
-      details: {
-        name: mealData.details.name,
-        ingredients: mealData.details.ingredients || [],
-        instructions: mealData.details.instructions || [],
-        cookingTime: mealData.details.cookingTime || "",
-        servings: mealData.details.servings || 1
-      },
-      notes: mealData.notes || "",
-      recipeId: mealData.recipeId,
-      mealId: mealData.mealId
-    });
+    // Validate that either recipeId or mealId is provided, but not both
+    if ((!data.recipeId && !data.mealId) || (data.recipeId && data.mealId)) {
+      throw new Error('Either recipeId or mealId must be provided, but not both');
+    }
 
-    console.log('Attempting to save meal plan:', JSON.stringify(newMealPlan, null, 2));
-    const savedMealPlan = await newMealPlan.save();
-    console.log('Meal plan saved successfully:', savedMealPlan._id);
+    // Safely convert string IDs to ObjectIds
+    const mealPlanData = {
+      ...data,
+      // Only convert if the ID exists and is a valid ObjectId
+      recipeId: data.recipeId && mongoose.isValidObjectId(data.recipeId) 
+        ? new mongoose.Types.ObjectId(data.recipeId) 
+        : null,
+      mealId: data.mealId && mongoose.isValidObjectId(data.mealId)
+        ? new mongoose.Types.ObjectId(data.mealId)
+        : null
+    };
 
+    console.log('Processed meal plan data:', mealPlanData);
+
+    const mealPlan = new MealPlan(mealPlanData);
+    const savedMealPlan = await mealPlan.save();
+    
     return NextResponse.json(savedMealPlan, { status: 201 });
   } catch (error) {
-    console.error('Detailed error:', {
-      message: error.message,
-      name: error.name,
-      stack: error.stack
-    });
+    console.error('Error creating meal plan:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create meal plan' },
-      { status: 500 }
+      { message: error.message || 'Failed to add meal plan' },
+      { status: 400 }
     );
   }
 }

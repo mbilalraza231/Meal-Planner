@@ -19,17 +19,13 @@ const mealPlanSchema = new mongoose.Schema({
   date: { 
     type: Date, 
     required: true,
-    validate: {
-      validator: function(v) {
-        return v instanceof Date && !isNaN(v);
-      },
-      message: 'Invalid date format'
-    }
+    default: Date.now
   },
   mealType: {
     type: String,
     enum: ['breakfast', 'lunch', 'dinner', 'snack'],
-    required: true
+    required: true,
+    default: 'dinner'
   },
   details: {
     name: { type: String, required: true },
@@ -38,8 +34,7 @@ const mealPlanSchema = new mongoose.Schema({
     cookingTime: { type: String, default: "" },
     servings: { type: Number, default: 1 }
   },
-  notes: { type: String, default: "" },
-  
+  notes: { type: String, default: "" }
 }, { 
   timestamps: true,
   strict: true
@@ -48,9 +43,12 @@ const mealPlanSchema = new mongoose.Schema({
 // Custom validation to ensure at least one of mealId or recipeId is provided
 mealPlanSchema.pre('validate', function(next) {
   if (!this.mealId && !this.recipeId) {
-    return next(new Error('Either mealId or recipeId must be provided.'));
+    next(new Error('Either mealId or recipeId must be provided.'));
+  } else if (this.mealId && this.recipeId) {
+    next(new Error('Cannot provide both mealId and recipeId.'));
+  } else {
+    next();
   }
-  next();
 });
 
 // Add pre-save middleware for logging

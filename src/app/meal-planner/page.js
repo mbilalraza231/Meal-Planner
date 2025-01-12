@@ -1,142 +1,59 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { format } from "date-fns";
-import { useMealPlan } from "@/hooks/useMealPlan";
-import MealPlannerWelcome from "@/app/components/MealPlannerWelcome";
-import AddMealModal from "@/app/components/modals/AddMealModal";
-import DeleteConfirmModal from "@/app/components/modals/DeleteConfirmModal";
-import EditMealModal from "@/app/components/modals/EditMealModal";
-import ViewDetailsModal from "@/app/components/modals/ViewDetailsModal";
-import RecipeCard from "@/app/components/RecipeCard";
+import { useState } from 'react';
+import { useMealPlan } from '@/hooks/useMealPlan';
+import { format } from 'date-fns';
+import MealPlannerWelcome from '../components/MealPlannerWelcome';
+import AddMealModal from '../components/modals/AddMealModal';
+import DeleteConfirmModal from '../components/modals/DeleteConfirmModal';
 
 export default function MealPlannerPage() {
-  const {
-    mealPlans,
-    newMeal,
-    setNewMeal,
-    addMealPlan,
-    deleteMealPlan,
-    updateMealPlan,
-    resetNewMeal,
-  } = useMealPlan();
-
-  const [showModal, setShowModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const { mealPlans, setMealPlans, loading } = useMealPlan();
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedRecipe, setSelectedRecipe] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
-  const [editingMeal, setEditingMeal] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedMealPlanId, setSelectedMealPlanId] = useState(null);
+  const [selectedMeal, setSelectedMeal] = useState(null);
 
-  useEffect(() => {
-    const checkForSelectedRecipe = () => {
-      try {
-        const savedRecipeString = localStorage.getItem("selectedRecipeForMealPlan");
-        if (savedRecipeString) {
-          const savedRecipe = JSON.parse(savedRecipeString);
-          setNewMeal({
-            recipeName: savedRecipe.title,
-            date: format(new Date(), "yyyy-MM-dd"),
-            mealType: "dinner",
-            servings: savedRecipe.servings || 1,
-            notes: savedRecipe.description || "",
-            details: {
-              ingredients: savedRecipe.ingredients || [],
-              instructions: savedRecipe.instructions || [],
-              cookingTime: savedRecipe.cookingTime || "",
-              servings: savedRecipe.servings || 1,
-            },
-          });
-          setShowAddModal(true);
-          localStorage.removeItem("selectedRecipeForMealPlan");
-        }
-      } catch (error) {
-        console.error("Error processing saved recipe:", error);
-      }
-    };
-
-    checkForSelectedRecipe();
-  }, []);
-
-  const handleAddMeal = async (mealData) => {
-    try {
-      await addMealPlan(mealData);
-      setShowAddModal(false);
-      resetNewMeal();
-    } catch (error) {
-      console.error('Error adding meal:', error);
-      alert('Failed to add meal plan: ' + error.message);
-    }
-  };
-
-  const handleViewDetails = (plan) => {
-    setSelectedRecipe(plan);
-    setShowModal(true);
-  };
-
-  const handleEdit = (meal) => {
-    setEditingMeal(meal);
-    setShowEditModal(true);
-  };
-
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
-    setMealPlans(mealPlans.map((m) => (m.id === editingMeal.id ? editingMeal : m)));
-    setShowEditModal(false);
-    setEditingMeal(null);
+  const handleAddNew = () => {
+    setShowAddModal(true);
   };
 
   const handleDelete = (id) => {
-    setDeleteId(id);
+    setSelectedMealPlanId(id);
     setShowDeleteModal(true);
   };
 
-  console.log('setShowAddModal:', setShowAddModal);
+  const handleConfirmDelete = async () => {
+    try {
+      const response = await fetch(`/api/meal-plans/${selectedMealPlanId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete meal plan');
+      }
+
+      setMealPlans(prevPlans => prevPlans.filter(plan => plan._id !== selectedMealPlanId));
+      setShowDeleteModal(false);
+    } catch (error) {
+      console.error('Error deleting meal plan:', error);
+      alert(error.message);
+    }
+  };
+
+  const handleMealPlanSuccess = (newMealPlan) => {
+    setMealPlans(prevPlans => [...prevPlans, newMealPlan]);
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <MealPlannerWelcome onAddNew={() => setShowAddModal(true)} />
-      
-      {/* Modals */}
-      <AddMealModal
-        show={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        meal={newMeal}
-        onMealChange={setNewMeal}
-        onSubmit={handleAddMeal}
-      />
-      <DeleteConfirmModal
-        show={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={() => {
-          deleteMealPlan(deleteId);
-          setShowDeleteModal(false);
-          setDeleteId(null);
-        }}
-      />
-      {showEditModal && (
-        <EditMealModal
-          showEditModal={showEditModal}
-          setShowEditModal={setShowEditModal}
-          editingMeal={editingMeal}
-          setEditingMeal={setEditingMeal}
-          handleEditSubmit={handleEditSubmit}
-        />
-      )}
-      <ViewDetailsModal
-        show={showModal}
-        onClose={() => {
-          setShowModal(false);
-          setSelectedRecipe(null);
-        }}
-        recipe={selectedRecipe}
-      />
+    <div className="container mx-auto px-4 py-8">
+      <MealPlannerWelcome onAddNew={handleAddNew} />
 
-      {/* Meal Plan Table */}
-      <div className="container mx-auto px-4 mt-8">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <div className="mt-8">
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
@@ -159,10 +76,7 @@ export default function MealPlannerPage() {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
                 {mealPlans.map((plan) => (
-                  <tr
-                    key={plan._id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  >
+                  <tr key={plan._id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <td className="px-6 py-4 text-gray-900 dark:text-white">
                       {plan.details.name} 
                     </td>
@@ -213,7 +127,43 @@ export default function MealPlannerPage() {
             </table>
           </div>
         </div>
-      </div>
+      )}
+
+      {showAddModal && (
+        <AddMealModal
+          show={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onSubmit={async (mealPlanData) => {
+            try {
+              const response = await fetch('/api/meal-plans', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(mealPlanData)
+              });
+
+              if (!response.ok) {
+                throw new Error('Failed to create meal plan');
+              }
+
+              const savedMealPlan = await response.json();
+              handleMealPlanSuccess(savedMealPlan);
+              setShowAddModal(false);
+            } catch (error) {
+              console.error('Error creating meal plan:', error);
+              alert(error.message);
+            }
+          }}
+          onSuccess={handleMealPlanSuccess}
+        />
+      )}
+
+      <DeleteConfirmModal
+        show={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }

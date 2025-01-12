@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 
 const MealSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+  userId: {
+    type: String,
+    required: true,
+    default: 'temp-user-id'
   },
   name: { 
     type: String, 
@@ -13,10 +13,6 @@ const MealSchema = new mongoose.Schema({
   mealType: {
     type: String,
     enum: ['breakfast', 'lunch', 'dinner', 'snack'],
-    required: true
-  },
-  date: {
-    type: Date,
     required: true
   },
   // Essential meal details
@@ -28,7 +24,7 @@ const MealSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Add indexes for better query performance
-MealSchema.index({ user: 1, date: 1 });
+MealSchema.index({ userId: 1 });
 MealSchema.index({ mealType: 1 });
 
 export default mongoose.models.Meal || mongoose.model('Meal', MealSchema);

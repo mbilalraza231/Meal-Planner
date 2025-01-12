@@ -9,11 +9,14 @@ import Welcome from "./components/Welcome";
 import FeaturedRecipeSlide from "./components/FeaturedRecipeSlide";
 import { useRecipeData } from "@/hooks/useRecipeData";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import AddMealModal from "./components/modals/AddMealModal";
 
 export default function Home() {
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
   const { featuredRecipes, popularRecipes, loading } = useRecipeData();
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
 
   const handlePrevSlide = () => {
     setCurrentSlide((prev) =>
@@ -28,12 +31,32 @@ export default function Home() {
   };
 
   const handleAddToMealPlan = (recipe) => {
+    setSelectedRecipe(recipe);
+    setShowAddModal(true);
+  };
+
+  const handleMealPlanSubmit = async (mealPlanData) => {
     try {
-      localStorage.setItem("selectedRecipeForMealPlan", JSON.stringify(recipe));
-      router.push("/meal-planner"); // Navigate to the meal planner page
+      // If it's a recipe, use recipeId, otherwise use mealId
+      if (selectedRecipe) {
+        mealPlanData.recipeId = selectedRecipe._id;
+        mealPlanData.mealId = null;
+      } else {
+        mealPlanData.mealId = selectedRecipe._id;
+        mealPlanData.recipeId = null;
+      }
+      
+      await onSubmit(mealPlanData);
+      onClose();
     } catch (error) {
-      console.error("Error adding to meal plan:", error);
+      console.error('Error creating meal plan:', error);
+      alert(error.message);
     }
+  };
+
+  const handleMealPlanSuccess = (newMealPlan) => {
+    // Show success message or handle UI update
+    alert('Recipe added to meal plan successfully!');
   };
 
   if (loading) {
@@ -118,6 +141,19 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {showAddModal && (
+        <AddMealModal
+          show={showAddModal}
+          onClose={() => {
+            setShowAddModal(false);
+            setSelectedRecipe(null);
+          }}
+          onSubmit={handleMealPlanSubmit}
+          onSuccess={handleMealPlanSuccess}
+          recipe={selectedRecipe}
+        />
+      )}
     </div>
   );
 }
