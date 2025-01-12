@@ -2,10 +2,59 @@
 
 import { useState } from 'react';
 import { useMealPlan } from '@/hooks/useMealPlan';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import MealPlannerWelcome from '../components/MealPlannerWelcome';
 import AddMealModal from '../components/modals/AddMealModal';
 import DeleteConfirmModal from '../components/modals/DeleteConfirmModal';
+import ViewDetailsModal from '../components/modals/ViewDetailsModal';
+
+const DetailsModal = ({ mealPlan, onClose }) => {
+  if (!mealPlan) return null;
+
+  // Format the date
+  const formattedDate = format(parseISO(mealPlan.date), 'EEEE, MMMM dd, yyyy');
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
+        <h2 className="text-xl font-bold mb-4 dark:text-white">{mealPlan.details.name}</h2>
+        <p className="text-gray-600 dark:text-gray-300">Date: {formattedDate}</p>
+        <p className="text-gray-600 dark:text-gray-300">Cooking Time: {mealPlan.details.cookingTime}</p>
+        <p className="text-gray-600 dark:text-gray-300">Servings: {mealPlan.details.servings}</p>
+        <p className="text-gray-600 dark:text-gray-300">Meal Type: {mealPlan.mealType}</p>
+
+        <div className="mt-4">
+          <h3 className="font-semibold dark:text-white">Ingredients:</h3>
+          <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300">
+            {mealPlan.details.ingredients.map((ingredient, index) => (
+              <li key={index}>{ingredient}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-4">
+          <h3 className="font-semibold dark:text-white">Instructions:</h3>
+          <ol className="list-decimal pl-5 text-gray-600 dark:text-gray-300">
+            {mealPlan.details.instructions.map((instruction, index) => (
+              <li key={index}>{instruction}</li>
+            ))}
+          </ol>
+        </div>
+
+        {mealPlan.notes && (
+          <div className="mt-4">
+            <h3 className="font-semibold dark:text-white">Notes:</h3>
+            <p className="text-gray-600 dark:text-gray-300">{mealPlan.notes}</p>
+          </div>
+        )}
+
+        <button onClick={onClose} className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded">
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export default function MealPlannerPage() {
   const { mealPlans, setMealPlans, loading } = useMealPlan();
@@ -13,6 +62,8 @@ export default function MealPlannerPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedMealPlanId, setSelectedMealPlanId] = useState(null);
   const [selectedMeal, setSelectedMeal] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   const handleAddNew = () => {
     setShowAddModal(true);
@@ -43,6 +94,17 @@ export default function MealPlannerPage() {
 
   const handleMealPlanSuccess = (newMealPlan) => {
     setMealPlans(prevPlans => [...prevPlans, newMealPlan]);
+  };
+
+  const handleViewDetails = (plan) => {
+    console.log('View Details clicked for plan:', plan);
+    setSelectedPlan(plan);
+    setShowDetailsModal(true);
+  };
+
+  const closeDetailsModal = () => {
+    setShowDetailsModal(false);
+    setSelectedPlan(null);
   };
 
   return (
@@ -98,12 +160,12 @@ export default function MealPlannerPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <button
+                     <button
                         onClick={() => handleViewDetails(plan)}
                         className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
                       >
                         View Details
-                      </button>
+                      </button> 
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-3">
@@ -164,6 +226,8 @@ export default function MealPlannerPage() {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleConfirmDelete}
       />
+
+      <ViewDetailsModal show={showDetailsModal} onClose={closeDetailsModal} mealPlan={selectedPlan} />
     </div>
   );
 }
