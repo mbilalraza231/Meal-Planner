@@ -74,13 +74,23 @@ export default function MealPlannerPage() {
 
   const handleAddNew = async (mealPlanData) => {
     try {
-      const savedMealPlan = await addMealPlan(mealPlanData);
-      setMealPlans(prevPlans => [...prevPlans, savedMealPlan]);
-      setShowAddModal(false);
+      const newMealPlan = await addMealPlan(mealPlanData);
+      if (newMealPlan) {
+        // Update the state with the new meal plan
+        setMealPlans(prevMealPlans => {
+          const updatedPlans = [...prevMealPlans, newMealPlan];
+          console.log('Updated meal plans:', updatedPlans); // Debug log
+          return updatedPlans;
+        });
+        setShowAddModal(false);
+        return newMealPlan; // Return the new meal plan to indicate success
+      }
     } catch (error) {
-      alert(error.message);
+      console.error('Error adding meal plan:', error);
+      throw error; // Propagate the error to be handled by the modal
     }
   };
+
 
   const handleDelete = (id) => {
     setSelectedMealPlanId(id);

@@ -32,7 +32,7 @@ export default function Home() {
     );
   };
 
-  const handleAddToMealPlan = (recipe) => {
+  const handleAddToMealPlan = async (recipe) => {
     setSelectedRecipe(recipe);
     setShowAddModal(true);
   };
@@ -49,25 +49,27 @@ export default function Home() {
 
   const handleMealPlanSubmit = async (mealPlanData) => {
     try {
-      // If it's a recipe, use recipeId, otherwise use mealId
-      if (selectedRecipe) {
-        mealPlanData.recipeId = selectedRecipe._id;
-        mealPlanData.mealId = null;
-      } else {
-        mealPlanData.mealId = selectedRecipe._id;
-        mealPlanData.recipeId = null;
+      const response = await fetch('/api/meal-plans', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(mealPlanData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create meal plan');
       }
-      
-      await onSubmit(mealPlanData);
-      onClose();
+
+      const savedMealPlan = await response.json();
+      return savedMealPlan;
     } catch (error) {
       console.error('Error creating meal plan:', error);
-      alert(error.message);
+      throw error;
     }
   };
 
   const handleMealPlanSuccess = (newMealPlan) => {
-    // Show success message or handle UI update
     alert('Recipe added to meal plan successfully!');
   };
 
