@@ -11,11 +11,11 @@ const MealSchema = new mongoose.Schema({
     required: true 
   },
   // Essential meal details
-  ingredients: [String],
-  instructions: [String],
-  cookingTime: String,
-  servings: Number,
-  notes: String
+  ingredients: [{ type: String, required: true }  ],
+  instructions: [{ type: String, required: true }],
+  cookingTime: { type: String, required: true },
+  servings: { type: Number, required: true, default: 1},
+  notes: { type: String, default: ""}
 }, { timestamps: true });
 
 // Add indexes for better query performance

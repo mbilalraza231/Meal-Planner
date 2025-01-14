@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from 'react';
-import { useMealPlan } from '@/hooks/useMealPlan';
+import { useMealPlans } from '@/hooks/useMealPlans';
+import { useAddMealPlan } from '@/hooks/useAddMealPlan';
+import { useDeleteMealPlan } from '@/hooks/useDeleteMealPlan';
 import { format, parseISO } from 'date-fns';
 import MealPlannerWelcome from '../components/MealPlannerWelcome';
 import AddMealModal from '../components/modals/AddMealModal';
@@ -59,7 +61,9 @@ const DetailsModal = ({ mealPlan, onClose }) => {
 };
 
 export default function MealPlannerPage() {
-  const { mealPlans, setMealPlans, loading } = useMealPlan();
+  const { mealPlans, setMealPlans, loading } = useMealPlans();
+  const { addMealPlan } = useAddMealPlan();
+  const { deleteMealPlan } = useDeleteMealPlan();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedMealPlanId, setSelectedMealPlanId] = useState(null);
@@ -68,8 +72,14 @@ export default function MealPlannerPage() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const handleAddNew = () => {
-    setShowAddModal(true);
+  const handleAddNew = async (mealPlanData) => {
+    try {
+      const savedMealPlan = await addMealPlan(mealPlanData);
+      setMealPlans(prevPlans => [...prevPlans, savedMealPlan]);
+      setShowAddModal(false);
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const handleDelete = (id) => {
@@ -79,24 +89,12 @@ export default function MealPlannerPage() {
 
   const handleConfirmDelete = async () => {
     try {
-      const response = await fetch(`/api/meal-plans/${selectedMealPlanId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete meal plan');
-      }
-
+      await deleteMealPlan(selectedMealPlanId);
       setMealPlans(prevPlans => prevPlans.filter(plan => plan._id !== selectedMealPlanId));
       setShowDeleteModal(false);
     } catch (error) {
-      console.error('Error deleting meal plan:', error);
       alert(error.message);
     }
-  };
-
-  const handleMealPlanSuccess = (newMealPlan) => {
-    setMealPlans(prevPlans => [...prevPlans, newMealPlan]);
   };
 
   const handleViewDetails = (plan) => {
@@ -165,9 +163,12 @@ export default function MealPlannerPage() {
     }
   };
 
+
+  
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <MealPlannerWelcome onAddNew={handleAddNew} />
+      <MealPlannerWelcome onAddNew={() => setShowAddModal(true)} />
 
       {loading ? (
         <div>Loading...</div>
@@ -252,54 +253,7 @@ export default function MealPlannerPage() {
         <AddMealModal
           show={showAddModal}
           onClose={() => setShowAddModal(false)}
-          onSubmit={async (mealPlanData) => {
-            try {
-              // Ensure mealType is included in the request
-              const dataToSubmit = {
-                userId: 'temp-user-id',
-                mealType: mealPlanData.mealType || 'dinner',
-                date: mealPlanData.date,
-                notes: mealPlanData.notes || "",
-                details: {
-                  mealName: mealPlanData.details.mealName,
-                  servings: mealPlanData.details.servings,
-                  cookingTime: mealPlanData.details.cookingTime,
-                  ingredients: mealPlanData.details.ingredients || [],
-                  instructions: mealPlanData.details.instructions || []
-                }
-              };
-
-              // Add mealId or recipeId if present
-              if (mealPlanData.mealId) {
-                dataToSubmit.mealId = mealPlanData.mealId;
-              }
-              if (mealPlanData.recipeId) {
-                dataToSubmit.recipeId = mealPlanData.recipeId;
-              }
-
-              console.log('Submitting meal plan data:', dataToSubmit);
-
-              const response = await fetch('/api/meal-plans', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(dataToSubmit)
-              });
-
-              if (!response.ok) {
-                throw new Error('Failed to create meal plan');
-              }
-
-              const savedMealPlan = await response.json();
-              handleMealPlanSuccess(savedMealPlan);
-              setShowAddModal(false);
-            } catch (error) {
-              console.error('Error creating meal plan:', error);
-              alert(error.message);
-            }
-          }}
-          onSuccess={handleMealPlanSuccess}
+          onSubmit={handleAddNew}
         />
       )}
 
