@@ -1,34 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useRecipeById } from '@/hooks/useRecipe';
 
 export default function RecipeDetails() {
   const { id } = useParams();
-  const [recipe, setRecipe] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchRecipeDetails = async () => {
-      try {
-        const response = await fetch(`/api/recipes/${id}`);
-        if (!response.ok) throw new Error("Recipe not found");
-        const data = await response.json();
-        setRecipe(data);
-      } catch (error) {
-        console.error("Error fetching recipe details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRecipeDetails();
-  }, [id]);
+  const { recipe, loading, error } = useRecipeById(id);
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+          {error}
+        </h2>
       </div>
     );
   }

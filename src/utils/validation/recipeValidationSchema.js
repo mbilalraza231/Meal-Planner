@@ -44,7 +44,7 @@ const recipeValidationSchema = Joi.object({
     'number.base': 'Reviews must be a number',
     'number.min': 'Reviews must be greater than or equal to 0',
   }),
-});
+}).unknown(false).strict(); // Disallow unknown fields and prevent type coercion
 
 export default recipeValidationSchema;
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 
-export default function Navbar() {
+export default function Navbar({ onScrollToAllRecipes }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -30,12 +30,15 @@ export default function Navbar() {
             <Link href="/" className="hover:text-indigo-400 transition-colors">
               Home
             </Link>
-            <Link
-              href="/recipes"
+            <button
               className="hover:text-indigo-400 transition-colors"
+              onClick={() => {
+                onScrollToAllRecipes();
+                setIsOpen(false);
+              }}
             >
               Recipes
-            </Link>
+            </button>
             <Link
               href="/meal-planner"
               className="hover:text-indigo-400 transition-colors"
@@ -64,13 +67,15 @@ export default function Navbar() {
             >
               Home
             </Link>
-            <Link
-              href="/recipes"
+            <button
               className="hover:text-indigo-400 transition-colors py-2"
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                onScrollToAllRecipes();
+                setIsOpen(false);
+              }}
             >
               Recipes
-            </Link>
+            </button>
             <Link
               href="/meal-planner"
               className="hover:text-indigo-400 transition-colors py-2"

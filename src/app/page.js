@@ -1,13 +1,13 @@
 // src/app/page.js
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import SearchBar from "./components/SearchBar";
 import RecipeCard from "./components/RecipeCard";
 import Welcome from "./components/Welcome";
 import FeaturedRecipeSlide from "./components/FeaturedRecipeSlide";
-import { useRecipeData } from "@/hooks/useRecipeData";
+import { useRecipeData } from "@/hooks/useRecipes";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import AddMealModal from "./components/modals/AddMealModal";
 
@@ -17,6 +17,8 @@ export default function Home() {
   const { featuredRecipes, popularRecipes, loading } = useRecipeData();
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  
+  const allRecipesRef = useRef(null);
 
   const handlePrevSlide = () => {
     setCurrentSlide((prev) =>
@@ -33,6 +35,16 @@ export default function Home() {
   const handleAddToMealPlan = (recipe) => {
     setSelectedRecipe(recipe);
     setShowAddModal(true);
+  };
+
+  const handleScrollToAllRecipes = () => {
+    const allRecipesSection = document.getElementById('all-recipes');
+    if (allRecipesSection) {
+      const navbarHeight = document.querySelector('nav').offsetHeight; // Get the height of the navbar
+      const offset = 20; // Additional offset to ensure the heading is fully visible
+      const topPosition = allRecipesSection.offsetTop - navbarHeight - offset; // Calculate the top position minus navbar height and offset
+      window.scrollTo({ top: topPosition, behavior: 'smooth' });
+    }
   };
 
   const handleMealPlanSubmit = async (mealPlanData) => {
@@ -95,7 +107,6 @@ export default function Home() {
                 />
               </div>
             ))}
-
             <button
               onClick={handlePrevSlide}
               className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition-all"
@@ -110,24 +121,11 @@ export default function Home() {
             >
               <FaChevronRight size={24} />
             </button>
-
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-              {featuredRecipes.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    index === currentSlide ? "bg-white" : "bg-white/50 hover:bg-white/75"
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
           </div>
         </div>
       </section>
 
-      <section className="container mx-auto px-4 py-8 md:py-12">
+      <section id="all-recipes" ref={allRecipesRef} className="container mx-auto px-4 py-8 md:py-12 mt-0">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-white">
           All Recipes
         </h2>
