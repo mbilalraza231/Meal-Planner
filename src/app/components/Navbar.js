@@ -3,9 +3,45 @@
 import Link from "next/link";
 import { useState } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
+import { useRouter } from 'next/navigation';
 
-export default function Navbar({ onScrollToAllRecipes }) {
+export default function Navbar() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleRecipesClick = async (e) => {
+    e.preventDefault();
+    
+    // If we're not on the home page, navigate to home first
+    if (window.location.pathname !== '/') {
+      await router.push('/');
+      // Increase the delay to ensure the page is fully loaded
+      setTimeout(() => {
+        const allRecipesSection = document.getElementById('all-recipes');
+        if (allRecipesSection) {
+          const navbarHeight = document.querySelector('nav').offsetHeight;
+          const offset = 20;
+          const topPosition = allRecipesSection.offsetTop - navbarHeight - offset;
+          window.scrollTo({ 
+            top: topPosition, 
+            behavior: 'instant' 
+          });
+        }
+      }, 500); // Increased delay to 500ms
+    } else {
+      // If already on home page, just scroll
+      const allRecipesSection = document.getElementById('all-recipes');
+      if (allRecipesSection) {
+        const navbarHeight = document.querySelector('nav').offsetHeight;
+        const offset = 20;
+        const topPosition = allRecipesSection.offsetTop - navbarHeight - offset;
+        window.scrollTo({ 
+          top: topPosition, 
+          behavior: 'instant' 
+        });
+      }
+    }
+  };
 
   return (
     <nav className="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
@@ -32,10 +68,7 @@ export default function Navbar({ onScrollToAllRecipes }) {
             </Link>
             <button
               className="hover:text-indigo-400 transition-colors"
-              onClick={() => {
-                onScrollToAllRecipes();
-                setIsOpen(false);
-              }}
+              onClick={handleRecipesClick}
             >
               Recipes
             </button>
@@ -69,10 +102,7 @@ export default function Navbar({ onScrollToAllRecipes }) {
             </Link>
             <button
               className="hover:text-indigo-400 transition-colors py-2"
-              onClick={() => {
-                onScrollToAllRecipes();
-                setIsOpen(false);
-              }}
+              onClick={handleRecipesClick}
             >
               Recipes
             </button>
