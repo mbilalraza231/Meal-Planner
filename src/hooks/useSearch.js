@@ -87,7 +87,6 @@ export function useSearch(options = { debounceMs: 500, limit: 10, minChars: 2 })
         }
     }, [options.limit, options.minChars]);
 
-    // Create debounced function with cancel capability
     const debouncedFetch = useCallback(
         debounce((term) => {
             if (term.trim().length >= options.minChars) {
@@ -97,7 +96,6 @@ export function useSearch(options = { debounceMs: 500, limit: 10, minChars: 2 })
         [fetchSearchResults, options.minChars, options.debounceMs]
     );
 
-    // Handle search updates
     const handleSearch = useCallback((term) => {
         setSearchTerm(term);
         

@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 
 export default function FeaturedRecipeSlide({ recipe, onViewRecipe, onAddToMealPlan, isActive, onSlideChange }) {
-  // Set up auto-sliding effect
   useEffect(() => {
     if (isActive) {
       const timer = setTimeout(() => {
         onSlideChange();
-      }, 5000); // Change slide every 5 seconds
+      }, 5000); 
 
       return () => clearTimeout(timer);
     }

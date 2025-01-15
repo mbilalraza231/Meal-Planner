@@ -1,16 +1,11 @@
-// src/app/layout.js
+
 "use client";
 
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
-//import { dbConnect } from '@/db/connectDb';
 
-// Initialize database connection at startup
-// if (process.env.NODE_ENV !== 'production') {
-//   dbConnect();
-// }
 
 export default function RootLayout({ children }) {
   const handleScrollToAllRecipes = () => {

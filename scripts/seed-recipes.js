@@ -10,7 +10,7 @@ async function seedRecipes() {
     console.log('\n📝 Seeding recipes...');
     await Recipe.deleteMany({});
 
-    // Validate each recipe before inserting
+        // Validate each recipe before inserting
     for (const recipe of recipes) {
       if (!recipe.title || typeof recipe.title !== 'string') {
         throw new Error(`Invalid recipe title: ${recipe.title}`);
@@ -18,7 +18,7 @@ async function seedRecipes() {
       if (!recipe.servings || typeof recipe.servings !== 'number') {
         throw new Error(`Invalid servings for recipe: ${recipe.title}`);
       }
-      // Add more validation checks as needed
+      // more validation checks
     }
 
     await Recipe.insertMany(recipes);

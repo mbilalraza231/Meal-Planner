@@ -5,12 +5,10 @@ export default function MealPlanForm({ mealPlan, onMealPlanChange, onSubmit, but
     console.log('Changing field:', field, 'to value:', value); // Debug log
     
     if (field === 'mealType' || field === 'date' || field === 'notes') {
-      // These fields should be at the root level
       const updatedMealPlan = { ...mealPlan, [field]: value };
       console.log('Updated meal plan:', updatedMealPlan); // Debug log
       onMealPlanChange(updatedMealPlan);
     } else {
-      // Other fields should be in the details object
       onMealPlanChange({
         ...mealPlan,
         details: {

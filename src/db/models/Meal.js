@@ -18,10 +18,8 @@ const MealSchema = new mongoose.Schema({
   notes: { type: String, default: ""}
 }, { timestamps: true });
 
-// Add indexes for better query performance
 MealSchema.index({ userId: 1 });
 
-// Delete the model if it exists to force recompilation
 if (mongoose.models.Meal) {
   delete mongoose.models.Meal;
 }

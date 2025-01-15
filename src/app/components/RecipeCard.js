@@ -1,7 +1,8 @@
 "use client";
 
+import React from 'react';
 import { useRouter } from "next/navigation";
-import { FaClock, FaUtensils, FaStar, FaRegBookmark } from "react-icons/fa";
+import { FaClock, FaUtensils, FaStar } from "react-icons/fa";
 
 export default function RecipeCard({ recipe, onAddToMealPlan }) {
   const router = useRouter();
@@ -28,9 +29,6 @@ export default function RecipeCard({ recipe, onAddToMealPlan }) {
             </span>
           </div>
         )}
-        <button className="absolute top-4 left-4 bg-white/20 hover:bg-white/30 backdrop-blur-sm p-2 rounded-full transition-all">
-          <FaRegBookmark className="text-white w-4 h-4" />
-        </button>
       </div>
 
       <div className="p-4 md:p-6">
@@ -42,14 +40,12 @@ export default function RecipeCard({ recipe, onAddToMealPlan }) {
         </p>
 
         <div className="flex items-center justify-between mb-4 text-sm text-gray-400">
-          {/* Left side - Rating */}
           <div className="flex items-center gap-1.5">
             <FaStar className="text-yellow-400 w-4 h-4" />
             <span>{recipe.rating}</span>
             <span className="text-gray-500">({recipe.reviews})</span>
           </div>
 
-          {/* Right side - Time and Servings */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <FaUtensils className="text-indigo-400 w-4 h-4" />

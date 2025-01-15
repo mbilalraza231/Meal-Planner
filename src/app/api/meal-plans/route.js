@@ -22,7 +22,6 @@ export async function POST(request) {
     const data = await request.json();
     console.log('Raw API received data:', data);
 
-    // Validate that either recipeId or mealId is provided, but not both
     if ((!data.recipeId && !data.mealId) || (data.recipeId && data.mealId)) {
       throw new Error('Either recipeId or mealId must be provided, but not both');
     }
@@ -30,7 +29,6 @@ export async function POST(request) {
     // Safely convert string IDs to ObjectIds
     const mealPlanData = {
       ...data,
-      // Only convert if the ID exists and is a valid ObjectId
       recipeId: data.recipeId && mongoose.isValidObjectId(data.recipeId) 
         ? new mongoose.Types.ObjectId(data.recipeId) 
         : null,
@@ -54,7 +52,6 @@ export async function POST(request) {
   }
 }
 
-// Optional: Add PUT and DELETE methods if needed
 export async function PUT(request) {
   try {
     await dbConnect();
