@@ -1,7 +1,7 @@
 // src/app/page.js
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from "next/navigation";
 import SearchBar from "./components/SearchBar";
 import RecipeCard from "./components/RecipeCard";
@@ -10,14 +10,28 @@ import FeaturedRecipeSlide from "./components/FeaturedRecipeSlide";
 import { useRecipeData } from "@/hooks/useRecipes";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import AddMealModal from "./components/modals/AddMealModal";
+import SearchResultCard from '@/app/components/SearchResultCard';
+import { useSearch } from '@/hooks/useSearch';
+
+const RESULTS_PER_PAGE = 5; // Number of search results to show initially
 
 export default function Home() {
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { featuredRecipes, popularRecipes, loading } = useRecipeData();
+  const { recipes, featuredRecipes, popularRecipes, loading } = useRecipeData();
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
-  
+  const {
+    searchTerm,
+    displayedResults,
+    isSearching,
+    handleSearch,
+    loadMore,
+    hasMore
+  } = useSearch(recipes, {
+    debounceMs: 300,
+    maxResults: 5
+  });
   const allRecipesRef = useRef(null);
 
   const handlePrevSlide = () => {
@@ -86,7 +100,47 @@ export default function Home() {
       <Welcome />
 
       <section className="container mx-auto px-4 py-8 md:py-12">
-        <SearchBar onSearch={() => {}} />
+        <div className="max-w-2xl mx-auto relative">
+          <SearchBar 
+            onSearch={handleSearch} 
+            isSearching={isSearching}
+          />
+          
+          {searchTerm && (
+            <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+              <div className="max-h-[400px] overflow-y-auto">
+                {isSearching ? (
+                  <div className="flex justify-center py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500"></div>
+                  </div>
+                ) : displayedResults.length > 0 ? (
+                  <>
+                    {displayedResults.map((recipe) => (
+                      <SearchResultCard
+                        key={recipe._id}
+                        recipe={recipe}
+                        searchTerm={searchTerm}
+                        onAddToMealPlan={handleAddToMealPlan}
+                      />
+                    ))}
+                    {hasMore && (
+                      <button
+                        onClick={loadMore}
+                        className="w-full py-2 text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        Load more results...
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+                    No recipes found matching "{searchTerm}"
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </section>
 
       <section className="container mx-auto px-4 py-8 md:py-12">
