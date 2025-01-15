@@ -41,17 +41,17 @@ export default function Home() {
     minChars: 2
   }) || {}; // Add fallback empty object in case useSearch returns undefined
 
-  const handlePrevSlide = () => {
-    setCurrentSlide((prev) =>
-      prev === 0 ? featuredRecipes.length - 1 : prev - 1
-    );
-  };
-
-  const handleNextSlide = () => {
+  const handleNextSlide = useCallback(() => {
     setCurrentSlide((prev) =>
       prev === featuredRecipes.length - 1 ? 0 : prev + 1
     );
-  };
+  }, [featuredRecipes.length]);
+
+  const handlePrevSlide = useCallback(() => {
+    setCurrentSlide((prev) =>
+      prev === 0 ? featuredRecipes.length - 1 : prev - 1
+    );
+  }, [featuredRecipes.length]);
 
   const handleAddToMealPlan = useCallback((recipe) => {
     setSelectedRecipe(recipe);
@@ -193,39 +193,43 @@ export default function Home() {
         <div className="relative rounded-2xl overflow-hidden shadow-2xl">
           <div className="relative h-[300px] sm:h-[400px] md:h-[500px] overflow-hidden">
             {featuredRecipes.map((recipe, index) => (
-              <div
+              <FeaturedRecipeSlide
                 key={recipe._id}
-                className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
-                  index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
-                }`}
-              >
-                <FeaturedRecipeSlide
-                  recipe={recipe}
-                  onViewRecipe={() => router.push(`/recipes/${recipe._id}`)}
-                  onAddToMealPlan={() => handleAddToMealPlan(recipe)}
-                />
-                <img
-                  src={recipe.image || "/R.jpeg"}
-                  alt={recipe.title}
-                  className="absolute inset-0 w-full h-full object-cover -z-10"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black from-35% via-black/50 to-transparent -z-[5]" />
-              </div>
+                recipe={recipe}
+                isActive={index === currentSlide}
+                onSlideChange={handleNextSlide}
+                onViewRecipe={() => router.push(`/recipes/${recipe._id}`)}
+                onAddToMealPlan={() => handleAddToMealPlan(recipe)}
+              />
             ))}
             <button
               onClick={handlePrevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition-all"
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-gray-300 hover:bg-gray-400 text-gray-700 p-3 rounded-full transition-all z-10 shadow-lg"
               aria-label="Previous slide"
             >
               <FaChevronLeft size={24} />
             </button>
             <button
               onClick={handleNextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition-all"
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-gray-300 hover:bg-gray-400 text-gray-700 p-3 rounded-full transition-all z-10 shadow-lg"
               aria-label="Next slide"
             >
               <FaChevronRight size={24} />
             </button>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              {featuredRecipes.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`w-3 h-3 rounded-full transition-all shadow-lg ${
+                    index === currentSlide
+                      ? "bg-gray-300 scale-125"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>

@@ -62,7 +62,7 @@ export default function Navbar() {
             {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
           </button>
 
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center space-x-8">
             <Link href="/" className="hover:text-indigo-400 transition-colors">
               Home
             </Link>
@@ -77,6 +77,15 @@ export default function Navbar() {
               className="hover:text-indigo-400 transition-colors"
             >
               Meal Planner
+            </Link>
+          </div>
+
+          <div className="hidden md:flex items-center">
+            <Link
+              href="/about"
+              className="hover:text-indigo-400 transition-colors font-medium"
+            >
+              About Us
             </Link>
           </div>
         </div>
@@ -106,6 +115,13 @@ export default function Navbar() {
               onClick={() => setIsOpen(false)}
             >
               Meal Planner
+            </Link>
+            <Link
+              href="/about"
+              className="hover:text-indigo-400 transition-colors py-2"
+              onClick={() => setIsOpen(false)}
+            >
+              About Us
             </Link>
           </div>
         </div>
