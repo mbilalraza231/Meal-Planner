@@ -23,14 +23,12 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
     onSubmit(mealPlan);
   };
 
-  // Format the initial date if it exists, otherwise use today's date
   const formattedDate = mealPlan?.date 
     ? new Date(mealPlan.date).toISOString().split('T')[0]
     : new Date().toISOString().split('T')[0];
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-[500px]">
-      {/* Fixed Top Section */}
+    <form onSubmit={handleSubmit} className="flex flex-col max-h-[80vh] overflow-y-auto">
       <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-indigo-100 dark:border-indigo-900 mb-4">
         <div className="grid grid-cols-2 gap-6 mb-4">
           <div>
@@ -45,7 +43,6 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
               required
             />
           </div>
-
           <div>
             <label className="block text-md font-medium text-gray-700 dark:text-gray-200 mb-1">
               Meal Type
@@ -63,7 +60,6 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
             </select>
           </div>
         </div>
-
         <div>
           <label className="block text-md font-medium text-gray-700 dark:text-gray-200 mb-1">
             Notes
@@ -73,12 +69,11 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
             onChange={(e) => handleChange('notes', e.target.value)}
             className="w-full px-3 py-2 text-md border rounded-md dark:bg-gray-700 focus:ring-2 focus:ring-indigo-500"
             rows="2"
-             placeholder="Enter any additional notes"
+            placeholder="Enter any additional notes"
           />
         </div>
       </div>
 
-      {/* Scrollable Middle Section */}
       <div className="flex-grow overflow-y-auto">
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-indigo-100 dark:border-indigo-900">
           <div className="space-y-4">
@@ -94,7 +89,6 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
                 required
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Servings
@@ -107,7 +101,6 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
                 required
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Cooking Time
@@ -120,7 +113,6 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
                 required
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Ingredients
@@ -132,7 +124,6 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
                 rows="3"
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Instructions
@@ -148,7 +139,6 @@ export default function EditMealPlanForm({ mealPlan, onMealPlanChange, onSubmit 
         </div>
       </div>
 
-      {/* Fixed Bottom Section */}
       <div className="mt-3">
         <button
           type="submit"

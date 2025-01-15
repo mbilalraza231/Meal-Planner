@@ -29,11 +29,10 @@ export default function MealForm({
 
   return (
     <div className="max-h-[500px] flex flex-col w-full bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-     
       <form
         id="mealForm"
         onSubmit={handleSubmit}
-        className="overflow-y-auto flex-1 px-4"
+        className="flex-1 px-4 overflow-y-auto max-h-[80vh]"
       >
         <div className="space-y-4 py-4">
           <div className="form-group">
