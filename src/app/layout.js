@@ -1,4 +1,3 @@
-
 "use client";
 
 import "./globals.css";
@@ -24,7 +23,7 @@ export default function RootLayout({ children }) {
         
           <div className="flex flex-col min-h-screen">
             <Navbar onScrollToAllRecipes={handleScrollToAllRecipes} />
-            <main className="flex-grow">{children}</main>
+            <main className="flex-grow pt-16">{children}</main>
             <Footer />
           </div>
         
