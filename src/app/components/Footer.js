@@ -2,8 +2,8 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-400 border-t border-gray-800">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-start">
-          <div className="text-center">
+        <div className="flex flex-col items-center md:flex-row justify-between">
+          <div className="text-center mb-4 md:mb-0">
             <h3 className="text-white text-lg font-semibold mb-4">
               MealPlanner
             </h3>
@@ -11,7 +11,7 @@ export default function Footer() {
               Your personal assistant for meal planning and recipe discovery.
             </p>
           </div>
-          <div className="text-center">
+          <div className="text-center mb-4 md:mb-0">
             <h4 className="text-white text-md font-semibold mb-4">
               Quick Links
             </h4>
@@ -47,7 +47,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-          <div className="text-center mr-8">
+          <div className="text-center">
             <h4 className="text-white text-md font-semibold mb-4">
               Contact
             </h4>
