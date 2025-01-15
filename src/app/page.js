@@ -121,7 +121,7 @@ export default function Home() {
                   <div className="flex justify-center py-4">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500"></div>
                   </div>
-                ) : displayedResults.length > 0 ? (
+                ) : Array.isArray(displayedResults) && displayedResults.length > 0 ? (
                   <>
                     {displayedResults.map((recipe) => (
                       <SearchResultCard

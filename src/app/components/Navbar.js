@@ -78,12 +78,6 @@ export default function Navbar() {
             >
               Meal Planner
             </Link>
-            <Link
-              href="/shopping-list"
-              className="hover:text-indigo-400 transition-colors"
-            >
-              Shopping List
-            </Link>
           </div>
         </div>
 
@@ -112,13 +106,6 @@ export default function Navbar() {
               onClick={() => setIsOpen(false)}
             >
               Meal Planner
-            </Link>
-            <Link
-              href="/shopping-list"
-              className="hover:text-indigo-400 transition-colors py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Shopping List
             </Link>
           </div>
         </div>
