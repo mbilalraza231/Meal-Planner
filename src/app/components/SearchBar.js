@@ -1,18 +1,14 @@
-import { useState, useCallback } from 'react';
+import React, { forwardRef } from 'react';
 
-export default function SearchBar({ onSearch, onReset, searchTerm }) {
-  const handleInputChange = useCallback((e) => {
-    const value = e.target.value;
-    onSearch(value);
-  }, [onSearch]);
-
+const SearchBar = forwardRef(({ onSearch, onReset, isSearching, searchTerm }, ref) => {
   return (
     <form onSubmit={(e) => e.preventDefault()} className="max-w-2xl mx-auto">
       <div className="relative">
         <input
+          ref={ref}
           type="text"
           value={searchTerm}
-          onChange={handleInputChange}
+          onChange={(e) => onSearch(e.target.value)}
           placeholder="Search recipes..."
           className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
         />
@@ -22,4 +18,6 @@ export default function SearchBar({ onSearch, onReset, searchTerm }) {
       </div>
     </form>
   );
-}
+});
+
+export default SearchBar;

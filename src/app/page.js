@@ -22,6 +22,7 @@ export default function Home() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const allRecipesRef = useRef(null);
+  const searchInputRef = useRef(null); // Create a ref for the search input
   
   // Destructure with default value for displayedResults
   const {
@@ -93,6 +94,15 @@ export default function Home() {
     alert('Recipe added to meal plan successfully!');
   };
 
+  const focusSearchInput = () => {
+    if (searchInputRef.current) {
+      // Scroll to the search input
+      searchInputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Focus the search input
+      searchInputRef.current.focus();
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -111,11 +121,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      <Welcome />
+      <Welcome onBrowseClick={focusSearchInput} />
 
       <section className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-2xl mx-auto relative">
           <SearchBar 
+            ref={searchInputRef}
             onSearch={handleSearch}
             onReset={resetSearch}
             isSearching={isSearching}

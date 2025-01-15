@@ -1,4 +1,6 @@
-export default function Welcome() {
+import React from 'react';
+
+export default function Welcome({ onBrowseClick }) {
   return (
     <section className="relative bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 py-12 md:py-20 overflow-hidden">
       <div className="container mx-auto px-4">
@@ -18,7 +20,10 @@ export default function Welcome() {
             <button className="bg-white text-indigo-600 px-6 md:px-8 py-3 rounded-full hover:bg-gray-100 transition-all text-base md:text-lg font-semibold">
               Get Started
             </button>
-            <button className="bg-indigo-600 text-white px-6 md:px-8 py-3 rounded-full hover:bg-indigo-700 transition-all text-base md:text-lg font-semibold">
+            <button
+              onClick={onBrowseClick}
+              className="bg-indigo-600 text-white px-6 md:px-8 py-3 rounded-full hover:bg-indigo-700 transition-all text-base md:text-lg font-semibold"
+            >
               Browse Recipes
             </button>
           </div>
