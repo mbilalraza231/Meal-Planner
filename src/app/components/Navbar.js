@@ -98,27 +98,27 @@ export default function Navbar() {
           <div className="flex flex-col space-y-4 py-4">
             <Link
               href="/"
-              className="hover:text-indigo-400 transition-colors py-2"
+              className="hover:text-indigo-400 transition-colors py-2 text-left"
               onClick={() => setIsOpen(false)}
             >
               Home
             </Link>
             <button
-              className="hover:text-indigo-400 transition-colors py-2"
+              className="hover:text-indigo-400 transition-colors py-2 text-left"
               onClick={handleRecipesClick}
             >
               Recipes
             </button>
             <Link
               href="/meal-planner"
-              className="hover:text-indigo-400 transition-colors py-2"
+              className="hover:text-indigo-400 transition-colors py-2 text-left"
               onClick={() => setIsOpen(false)}
             >
               Meal Planner
             </Link>
             <Link
               href="/about"
-              className="hover:text-indigo-400 transition-colors py-2"
+              className="hover:text-indigo-400 transition-colors py-2 text-left"
               onClick={() => setIsOpen(false)}
             >
               About Us
