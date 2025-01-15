@@ -18,7 +18,7 @@ const RESULTS_PER_PAGE = 5; // Number of search results to show initially
 export default function Home() {
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { recipes, featuredRecipes, popularRecipes, loading } = useRecipeData();
+  const { recipes, featuredRecipes, popularRecipes, loading, error } = useRecipeData(1, 10);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const {
@@ -91,6 +91,14 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading recipes...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white text-xl">Error: {error}</div>
       </div>
     );
   }

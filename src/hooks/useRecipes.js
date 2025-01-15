@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 
-export function useRecipeData() {
+export function useRecipeData(page = 1, limit = 10) {
   const [recipes, setRecipes] = useState([]);
   const [featuredRecipes, setFeaturedRecipes] = useState([]);
   const [popularRecipes, setPopularRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const response = await fetch('/api/recipes');
+        const response = await fetch(`/api/recipes?page=${page}&limit=${limit}`);
         const allRecipes = await response.json();
-        
+
         if (!Array.isArray(allRecipes)) {
           console.error('Expected array of recipes, got:', allRecipes);
           return;
@@ -26,12 +27,13 @@ export function useRecipeData() {
         setLoading(false);
       } catch (error) {
         console.error('Error fetching recipes:', error);
+        setError(error.message);
         setLoading(false);
       }
     };
 
     fetchRecipes();
-  }, []);
+  }, [page, limit]);
 
-  return { recipes, featuredRecipes, popularRecipes, loading };
+  return { recipes, featuredRecipes, popularRecipes, loading, error };
 } 

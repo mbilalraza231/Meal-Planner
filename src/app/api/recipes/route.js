@@ -4,11 +4,38 @@ import Recipe from '@/db/models/Recipe';  // Mongoose model for Recipe
 import { dbConnect } from '@/db/connectDb'; // DB connection utility
 import recipeSchema from '@/utils/validation/recipeValidationSchema'; // Joi validation schema
 
-export async function GET() {
+import paginationValidationSchema from '@/utils/validation/paginationValidationSchema'; // Import the schema
+
+export async function GET(request) {
   await dbConnect();
 
+  const { searchParams } = new URL(request.url);
+  const page = parseInt(searchParams.get('page')) || 1;
+  const limit = parseInt(searchParams.get('limit')) || 10;
+  const search = searchParams.get('search') || '';
+
+  // Validate the query parameters with Joi
+  const { error, value } = paginationValidationSchema.validate({ page, limit, search });
+
+  // If validation fails, return an error response
+  if (error) {
+    return NextResponse.json({ error: error.details[0].message }, { status: 400 });
+  }
+
+  const { page: validatedPage, limit: validatedLimit, search: validatedSearch } = value;
+
   try {
-    const recipes = await Recipe.find();
+    // Query with pagination and optional search
+    const recipesQuery = Recipe.find()
+      .skip((validatedPage - 1) * validatedLimit)
+      .limit(validatedLimit);
+
+    if (validatedSearch) {
+      recipesQuery.where('title').regex(new RegExp(validatedSearch, 'i')); // Case-insensitive search
+    }
+
+    const recipes = await recipesQuery;
+
     return NextResponse.json(recipes);
   } catch (error) {
     console.error('Error fetching recipes:', error);
