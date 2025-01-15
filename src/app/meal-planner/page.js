@@ -258,6 +258,14 @@ export default function MealPlannerPage() {
               </table>
             </div>
           </div>
+
+          <div className="max-h-[calc(100vh-200px)] overflow-y-auto mt-4">
+            <EditMealPlanForm
+              mealPlan={selectedPlan}
+              onMealPlanChange={setSelectedPlan}
+              onSubmit={handleEditSubmit}
+            />
+          </div>
         </div>
       )}
 
