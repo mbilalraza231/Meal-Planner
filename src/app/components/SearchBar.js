@@ -1,11 +1,8 @@
 import { useState, useCallback } from 'react';
 
-export default function SearchBar({ onSearch }) {
-  const [searchInput, setSearchInput] = useState('');
-
+export default function SearchBar({ onSearch, onReset, searchTerm }) {
   const handleInputChange = useCallback((e) => {
     const value = e.target.value;
-    setSearchInput(value);
     onSearch(value);
   }, [onSearch]);
 
@@ -14,7 +11,7 @@ export default function SearchBar({ onSearch }) {
       <div className="relative">
         <input
           type="text"
-          value={searchInput}
+          value={searchTerm}
           onChange={handleInputChange}
           placeholder="Search recipes..."
           className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"

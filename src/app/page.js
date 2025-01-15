@@ -143,7 +143,11 @@ export default function Home() {
                         key={recipe._id}
                         recipe={recipe}
                         searchTerm={searchTerm}
-                        onAddToMealPlan={handleAddToMealPlan}
+                        onAddToMealPlan={(recipe) => {
+                          handleAddToMealPlan(recipe);
+                          resetSearch(); // Close dropdown and clear search
+                        }}
+                        onClose={resetSearch}
                       />
                     ))}
                     {hasMore && (
