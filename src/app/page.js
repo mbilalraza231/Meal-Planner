@@ -193,6 +193,12 @@ export default function Home() {
                   onViewRecipe={() => router.push(`/recipes/${recipe._id}`)}
                   onAddToMealPlan={() => handleAddToMealPlan(recipe)}
                 />
+                <img
+                  src={recipe.image || "/R.jpeg"}
+                  alt={recipe.title}
+                  className="absolute inset-0 w-full h-full object-cover -z-10"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black from-35% via-black/50 to-transparent -z-[5]" />
               </div>
             ))}
             <button
