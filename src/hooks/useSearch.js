@@ -1,62 +1,148 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import debounce from 'lodash/debounce';
 
-export function useSearch(options = { debounceMs: 300 }) {
+export function useSearch(options = { debounceMs: 500, limit: 10, minChars: 2 }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredRecipes, setFilteredRecipes] = useState([]);
     const [displayedResults, setDisplayedResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [error, setError] = useState(null);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
+    const [totalResults, setTotalResults] = useState(0);
     const abortControllerRef = useRef(null);
-    
-    // Fetch function
-    const fetchSearchResults = async (term) => {
-        if (!term.trim()) {
+    const lastSearchTermRef = useRef('');
+    const activeRequestRef = useRef(false);
+
+    const fetchSearchResults = useCallback(async (term, pageNum = 1) => {
+        // Don't search if term is too short
+        if (!term || term.trim().length < options.minChars) {
             setFilteredRecipes([]);
             setDisplayedResults([]);
+            setHasMore(false);
+            setTotalResults(0);
             return;
         }
 
+        // Set searching state immediately
         setIsSearching(true);
+        setError(null);
 
-        // Abort previous request
+        // Abort previous request if exists
         if (abortControllerRef.current) {
-            console.log('Aborting previous request');
             abortControllerRef.current.abort();
+            activeRequestRef.current = false;
         }
 
+        // Create new AbortController
         abortControllerRef.current = new AbortController();
-        const { signal } = abortControllerRef.current;
+        activeRequestRef.current = true;
 
         try {
-            const response = await fetch(`/api/recipes?search=${encodeURIComponent(term)}`, { signal });
-            const results = await response.json();
-            setFilteredRecipes(results);
-            setDisplayedResults(results);
+            const response = await fetch(
+                `/api/recipes?search=${encodeURIComponent(term)}&page=${pageNum}&limit=${options.limit}`,
+                { signal: abortControllerRef.current.signal }
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch results');
+            }
+
+            const data = await response.json();
+            
+            // Only update state if this is still the active request
+            if (!activeRequestRef.current) return;
+
+            // Ensure data is an array
+            const results = Array.isArray(data) ? data : (data.results || []);
+            const total = Array.isArray(data) ? results.length : (data.total || results.length);
+            
+            if (pageNum === 1) {
+                setFilteredRecipes(results);
+                setDisplayedResults(results);
+            } else {
+                setDisplayedResults(prev => [...prev, ...results]);
+            }
+            
+            setTotalResults(total);
+            setHasMore(results.length === options.limit);
+            setError(null);
+            lastSearchTermRef.current = term;
         } catch (error) {
             if (error.name === 'AbortError') {
-                console.log('Fetch aborted');
+                console.log('Request aborted');
             } else {
                 console.error('Error fetching search results:', error);
+                setError(error.message);
+                setDisplayedResults([]);
+                setFilteredRecipes([]);
+                setHasMore(false);
+                setTotalResults(0);
             }
         } finally {
-            setIsSearching(false);
+            if (activeRequestRef.current) {
+                setIsSearching(false);
+                activeRequestRef.current = false;
+            }
         }
-    };
+    }, [options.limit, options.minChars]);
 
-    // Debounced function
-    const debouncedFetch = useRef(
+    // Create debounced function with cancel capability
+    const debouncedFetch = useCallback(
         debounce((term) => {
-            console.log('Debounced search executing for:', term);
-            fetchSearchResults(term);
-        }, options.debounceMs)
-    ).current;
+            if (term.trim().length >= options.minChars) {
+                fetchSearchResults(term, 1);
+            }
+        }, options.debounceMs, { leading: false, trailing: true }),
+        [fetchSearchResults, options.minChars, options.debounceMs]
+    );
 
     // Handle search updates
     const handleSearch = useCallback((term) => {
-        console.log('Search term received:', term);
         setSearchTerm(term);
-        debouncedFetch(term);
-    }, [debouncedFetch]);
+        
+        // Clear results immediately if term is too short
+        if (!term || term.trim().length < options.minChars) {
+            setFilteredRecipes([]);
+            setDisplayedResults([]);
+            setHasMore(false);
+            setTotalResults(0);
+            setIsSearching(false);
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+                activeRequestRef.current = false;
+            }
+            debouncedFetch.cancel();
+        } else {
+            debouncedFetch(term);
+        }
+    }, [debouncedFetch, options.minChars]);
+
+    // Handle load more
+    const loadMore = useCallback(() => {
+        if (!isSearching && hasMore) {
+            const nextPage = page + 1;
+            setPage(nextPage);
+            fetchSearchResults(searchTerm, nextPage);
+        }
+    }, [isSearching, hasMore, page, searchTerm, fetchSearchResults]);
+
+    // Reset search
+    const resetSearch = useCallback(() => {
+        setSearchTerm('');
+        setFilteredRecipes([]);
+        setDisplayedResults([]);
+        setHasMore(false);
+        setTotalResults(0);
+        setPage(1);
+        setError(null);
+        setIsSearching(false);
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            activeRequestRef.current = false;
+        }
+        debouncedFetch.cancel();
+    }, []);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -64,6 +150,7 @@ export function useSearch(options = { debounceMs: 300 }) {
             debouncedFetch.cancel();
             if (abortControllerRef.current) {
                 abortControllerRef.current.abort();
+                activeRequestRef.current = false;
             }
         };
     }, [debouncedFetch]);
@@ -73,6 +160,11 @@ export function useSearch(options = { debounceMs: 300 }) {
         filteredRecipes,
         displayedResults,
         isSearching,
+        error,
         handleSearch,
+        hasMore,
+        loadMore,
+        resetSearch,
+        totalResults,
     };
 }

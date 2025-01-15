@@ -18,21 +18,27 @@ const RESULTS_PER_PAGE = 5; // Number of search results to show initially
 export default function Home() {
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { recipes, featuredRecipes, popularRecipes, loading, error } = useRecipeData(1, 10);
+  const { recipes, featuredRecipes, popularRecipes, loading, error: recipeError } = useRecipeData(1, 10);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
-  const {
-    searchTerm,
-    displayedResults,
-    isSearching,
-    handleSearch,
-    loadMore,
-    hasMore
-  } = useSearch(recipes, {
-    debounceMs: 300,
-    maxResults: 5
-  });
   const allRecipesRef = useRef(null);
+  
+  // Destructure with default value for displayedResults
+  const {
+    searchTerm = '',
+    displayedResults = [], // Ensure this has a default value
+    isSearching = false,
+    error: searchError,
+    handleSearch,
+    hasMore,
+    loadMore,
+    resetSearch,
+    totalResults = 0,
+  } = useSearch({
+    debounceMs: 500,
+    limit: 10,
+    minChars: 2
+  }) || {}; // Add fallback empty object in case useSearch returns undefined
 
   const handlePrevSlide = () => {
     setCurrentSlide((prev) =>
@@ -46,10 +52,10 @@ export default function Home() {
     );
   };
 
-  const handleAddToMealPlan = async (recipe) => {
+  const handleAddToMealPlan = useCallback((recipe) => {
     setSelectedRecipe(recipe);
     setShowAddModal(true);
-  };
+  }, []);
 
   const handleScrollToAllRecipes = () => {
     const allRecipesSection = document.getElementById('all-recipes');
@@ -95,10 +101,10 @@ export default function Home() {
     );
   }
 
-  if (error) {
+  if (recipeError) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-xl">Error: {error}</div>
+        <div className="text-white text-xl">Error: {recipeError}</div>
       </div>
     );
   }
@@ -110,19 +116,28 @@ export default function Home() {
       <section className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-2xl mx-auto relative">
           <SearchBar 
-            onSearch={handleSearch} 
+            onSearch={handleSearch}
+            onReset={resetSearch}
             isSearching={isSearching}
+            searchTerm={searchTerm}
           />
           
           {searchTerm && (
             <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
               <div className="max-h-[400px] overflow-y-auto">
-                {isSearching ? (
+                {searchError ? (
+                  <p className="text-center text-red-500 dark:text-red-400 py-4">
+                    {searchError}
+                  </p>
+                ) : isSearching ? (
                   <div className="flex justify-center py-4">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500"></div>
                   </div>
-                ) : Array.isArray(displayedResults) && displayedResults.length > 0 ? (
+                ) : displayedResults.length > 0 ? (
                   <>
+                    <div className="p-2 text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                      Found {totalResults} results
+                    </div>
                     {displayedResults.map((recipe) => (
                       <SearchResultCard
                         key={recipe._id}
@@ -134,15 +149,20 @@ export default function Home() {
                     {hasMore && (
                       <button
                         onClick={loadMore}
-                        className="w-full py-2 text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                        disabled={isSearching}
+                        className="w-full py-2 text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Load more results...
+                        {isSearching ? 'Loading...' : 'Load more results...'}
                       </button>
                     )}
                   </>
-                ) : (
+                ) : searchTerm.length >= 2 ? (
                   <p className="text-center text-gray-500 dark:text-gray-400 py-4">
                     No recipes found matching "{searchTerm}"
+                  </p>
+                ) : (
+                  <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+                    Type at least 2 characters to search
                   </p>
                 )}
               </div>

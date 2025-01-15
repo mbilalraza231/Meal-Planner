@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export default function SearchBar({ onSearch }) {
   const [searchInput, setSearchInput] = useState('');
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const value = e.target.value;
     setSearchInput(value);
     onSearch(value);
-  };
+  }, [onSearch]);
 
   return (
     <form onSubmit={(e) => e.preventDefault()} className="max-w-2xl mx-auto">
